@@ -1,1 +1,19 @@
+# Site Metadata
+description: FiveM resource development tips, methods, and tools. Blog on things I find interestings.
+repository: TrevorBarns/trevorbarns.github.io
+author: Trevor Barns
+discord_handle: TrevorBarns#9205
+links:
+  github: https://github.com/TrevorBarns/
+  discord: https://discord.link/lvc
+  cfx_profile: https://forum.cfx.re/u/trevorbarns/
+
+
+### Build settings ###
+
+url: https://trevorbarns.github.io
+baseurl: ""
+show_downloads: true
+google_analytics:
 theme: jekyll-theme-cayman
+

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <script src="/assets/global/anchor.min.js"></script>
+    <script src="/assets/global/jquery-3.6.0.min.js"></script>
+    <script>
+      $(function() {
+        anchors.options.visible = 'hover'; 
+        anchors.options.placement = 'left';
+        
+        anchors.add('.post-content > h0, h1, h2, h3, h4, h5, h6');
+      });
+    </script>
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Trevor Barns’ Cookbook | FiveM resource development tips, methods, and tools. Blog on things I find interestings.</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Trevor Barns’ Cookbook" />
+<meta name="author" content="Trevor Barns" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="FiveM resource development tips, methods, and tools. Blog on things I find interestings." />
+<meta property="og:description" content="FiveM resource development tips, methods, and tools. Blog on things I find interestings." />
+<link rel="canonical" href="http://localhost:4000/" />
+<meta property="og:url" content="http://localhost:4000/" />
+<meta property="og:site_name" content="Trevor Barns’ Cookbook" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Trevor Barns’ Cookbook" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebSite","author":{"@type":"Person","name":"Trevor Barns"},"description":"FiveM resource development tips, methods, and tools. Blog on things I find interestings.","headline":"Trevor Barns’ Cookbook","name":"Trevor Barns’ Cookbook","url":"http://localhost:4000/"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="preload" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap" as="style" type="text/css" crossorigin>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="/assets/css/style.css?v=">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png">
+<link rel="manifest" href="/assets/images/site.webmanifest">
+<link rel="mask-icon" href="/assets/images/safari-pinned-tab.svg" color="#006f91">
+<link rel="shortcut icon" href="/assets/images/favicon.ico">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="msapplication-config" content="/assets/images/browserconfig.xml">
+<meta name="theme-color" content="#ffffff">
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <header class="page-header" role="banner">
+      <h1 class="project-name">Trevor Barns' Cookbook</h1>
+      <h2 class="project-tagline">FiveM resource development tips, methods, and tools. Blog on things I find interestings.</h2>
+        <a href="https://github.com/TrevorBarns/" target="_blank" class="btn">My Projects</a>
+        <a href="https://discord.link/lvc" target="_blank" class="btn">Join My Discord</a>
+        <a href="https://forum.cfx.re/u/trevorbarns/" target="_blank" class="btn">Find me on CFX</a>
+    </header>
+
+    <main id="content" class="main-content" role="main">
+      <h2 id="writing-file-to-server-in-fivem">Writing File to Server in FiveM</h2>
+<p>Saving data to a file can be useful if the data is relatively static and requires some overhead to generate. Instead of running a loop to rebuild data evertime a client loads in, it can be more efficient to read it from a file. Some items that may be useful to read from file: table of prices for a merchant script, postal numbers, table of controls, etc.</p>
+
+<h3 id="via-serverside-function">Via Serverside Function</h3>
+<p>If you wanted to encode a lua table to JSON and store the data for later retrieval:</p>
+<div class="language-lua highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">--server.lua</span>
+<span class="k">function</span> <span class="nf">WriteTableToFile</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span>
+	<span class="n">file</span> <span class="o">=</span> <span class="nb">io.open</span><span class="p">(</span><span class="s2">"resources/[scripts]/"</span><span class="o">..</span><span class="n">GetCurrentResourceName</span><span class="p">()</span><span class="o">..</span><span class="s2">"/"</span><span class="o">..</span><span class="n">filename</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="c1">--"w" for write (overrides existing data)</span>
+	<span class="k">if</span> <span class="n">file</span> <span class="k">then</span>
+		<span class="n">file</span><span class="p">:</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="p">.</span><span class="n">encode</span><span class="p">(</span><span class="n">table</span><span class="p">))</span>
+		<span class="nb">print</span><span class="p">(</span><span class="s2">"Writing to: ..resources/[scripts]/"</span><span class="o">..</span><span class="n">GetCurrentResourceName</span><span class="p">()</span><span class="o">..</span><span class="s2">"/"</span><span class="o">..</span><span class="n">filename</span><span class="p">)</span>
+	<span class="k">else</span>
+		<span class="nb">print</span><span class="p">(</span><span class="s2">"Log file couldn't be created"</span><span class="p">)</span>
+	<span class="k">end</span>
+	<span class="n">file</span><span class="p">:</span><span class="n">close</span><span class="p">()</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>Append text to an existing (or create a new) file:</p>
+<div class="language-lua highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">--server.lua</span>
+<span class="k">function</span> <span class="nf">AppendTextToFile</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+	<span class="n">file</span> <span class="o">=</span> <span class="nb">io.open</span><span class="p">(</span><span class="s2">"resources/[scripts]/"</span><span class="o">..</span><span class="n">GetCurrentResourceName</span><span class="p">()</span><span class="o">..</span><span class="s2">"/"</span><span class="o">..</span><span class="n">filename</span><span class="p">,</span> <span class="s2">"a"</span><span class="p">)</span>    <span class="c1">--"a" for append</span>
+	<span class="k">if</span> <span class="n">file</span> <span class="k">then</span>
+		<span class="n">file</span><span class="p">:</span><span class="n">write</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+		<span class="nb">print</span><span class="p">(</span><span class="s2">"Writing to: ..resources/[scripts]/"</span><span class="o">..</span><span class="n">GetCurrentResourceName</span><span class="p">()</span><span class="o">..</span><span class="s2">"/"</span><span class="o">..</span><span class="n">filename</span><span class="p">)</span>
+	<span class="k">else</span>
+		<span class="nb">print</span><span class="p">(</span><span class="s2">"Log file couldn't be created"</span><span class="p">)</span>
+	<span class="k">end</span>
+	<span class="n">file</span><span class="p">:</span><span class="n">close</span><span class="p">()</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>To read data from file on either client or server side:</p>
+<div class="language-lua highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">local</span> <span class="n">file_contents</span> <span class="o">=</span> <span class="n">LoadResourceFile</span><span class="p">(</span><span class="n">GetCurrentResourceName</span><span class="p">(),</span> <span class="s1">'PLUGINS/extra_controls/controls.json'</span><span class="p">)</span> <span class="c1">--where 'PLUGINS/extra_controls/controls.json' is listed in fxmanifest under files. In this case it's a JSON file, we can load that into a lua table using json.decode(string).</span>
+<span class="kd">local</span> <span class="n">table_from_file</span> <span class="o">=</span> <span class="n">json</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="n">file_contents</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>If it were a text document, you might want to parse the data using newline characters (<code class="language-plaintext highlighter-rouge">/n</code>):</p>
+<div class="language-lua highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">local</span> <span class="n">file_contents</span> <span class="o">=</span> <span class="n">LoadResourceFile</span><span class="p">(</span><span class="n">GetCurrentResourceName</span><span class="p">(),</span> <span class="s1">'foo.txt'</span><span class="p">)</span> 
+<span class="k">for</span> <span class="n">line</span><span class="p">,</span> <span class="n">newline</span> <span class="k">in</span> <span class="n">file_contents</span><span class="p">:</span><span class="n">gmatch</span><span class="s2">"([^\r\n]*)([\r\n]*)"</span> <span class="k">do</span>
+   <span class="nb">print</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<h3 id="via-event-development-purposes-only">Via Event (Development Purposes Only)</h3>
+<blockquote>
+  <p>⚠️ The below code is not safe for production use. This should only be used for development pursposes. The event allows malicious players to write potentially harmful data to the server.</p>
+</blockquote>
+
+<p>The event below is stored on a file that I deploy when needed for quickly saving tables to JSON files for later loading, an event is used since clients cannot directly write to the server, for obvious reasons.</p>
+<div class="language-lua highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">RegisterServerEvent</span><span class="p">(</span><span class="s1">'sv:WriteToFile'</span><span class="p">)</span> 
+<span class="n">AddEventHandler</span><span class="p">(</span><span class="s1">'sv:WriteToFile'</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span>
+	<span class="n">file</span> <span class="o">=</span> <span class="nb">io.open</span><span class="p">(</span><span class="s2">"resources/[scripts]/"</span><span class="o">..</span><span class="n">GetCurrentResourceName</span><span class="p">()</span><span class="o">..</span><span class="s2">"/"</span><span class="o">..</span><span class="n">filename</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span>
+	<span class="k">if</span> <span class="n">file</span> <span class="k">then</span>
+		<span class="n">file</span><span class="p">:</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="p">.</span><span class="n">encode</span><span class="p">(</span><span class="n">table</span><span class="p">))</span>
+		<span class="nb">print</span><span class="p">(</span><span class="s2">"Writing to: ..resources/[scripts]/"</span><span class="o">..</span><span class="n">GetCurrentResourceName</span><span class="p">()</span><span class="o">..</span><span class="s2">"/"</span><span class="o">..</span><span class="n">filename</span><span class="p">)</span>
+	<span class="k">else</span>
+		<span class="nb">print</span><span class="p">(</span><span class="s2">"Log file couldn't be created"</span><span class="p">)</span>
+	<span class="k">end</span>
+	<span class="n">file</span><span class="p">:</span><span class="n">close</span><span class="p">()</span>
+<span class="k">end</span><span class="p">)</span>
+</code></pre></div></div>
+<hr />
+
+<h2 id="detecting-keyboard-vs-controller-input">Detecting Keyboard vs. Controller Input</h2>
+<p>The native has been renamed a number of times but can be found <a href="https://docs.fivem.net/natives/?_0xA571D46727E2B718">here</a>, depending on your enviroment <code class="language-plaintext highlighter-rouge">IsInputDisabled</code>, <code class="language-plaintext highlighter-rouge">GetLastInputMethod</code>, and <code class="language-plaintext highlighter-rouge">IsUsingKeyboard</code> are equvilant.</p>
+
+<p>In the example below, control index 10 refers to <em>pageup</em> or <em>left-trigger</em> on controller. By using <code class="language-plaintext highlighter-rouge">IsInputDisabled</code> we limit input to keyboard only preventing the left-trigger activation on controller.</p>
+<div class="language-lua highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Citizen</span><span class="p">.</span><span class="n">CreateThread</span><span class="p">(</span><span class="k">function</span><span class="p">()</span>
+  <span class="k">if</span> <span class="n">IsInputDisabled</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="n">IsControlJustPressed</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span> <span class="k">then</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"do something here"</span><span class="p">)</span>
+  <span class="k">end</span>
+  <span class="n">Citizen</span><span class="p">.</span><span class="n">Wait</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="k">end</span><span class="p">)</span>
+</code></pre></div></div>
+<hr />
+
+<h2 id="lua-demo-online">Lua Demo Online</h2>
+<p>I highly recommend checking out <a href="https://www.lua.org/cgi-bin/demo">Lua Demo</a>, it allows you to run lua code online quickly. It does not have access to other libraries like JSON or CFX natives. But, can debug and experiment quickly with base lua functionality think tables, string manipulation, variable scoping. This is much faster than modifiying resource code, ensuring, alt tabbing every time you are trying to debug some functionality. I often replace data I would get from CFX natives with placeholder data.
+<img src="https://i.gyazo.com/ea9463d125fdd7f0163d3ee3bfe93175.png" alt="LuaDemo" /></p>
+
+<hr />
+
+<p>Text can be <strong>bold</strong>, <em>italic</em>, or <del>strikethrough</del>.</p>
+
+<p><a href="./another-page.html">Link to another page</a>.</p>
+
+<p>There should be whitespace between paragraphs.</p>
+
+<p>There should be whitespace between paragraphs. We recommend including a README, or a file with information about your project.</p>
+
+<h1 id="header-1">Header 1</h1>
+
+<p>This is a normal paragraph following a header. GitHub is a code hosting platform for version control and collaboration. It lets you and others work together on projects from anywhere.</p>
+
+<h2 id="header-2">Header 2</h2>
+
+<blockquote>
+  <p>This is a blockquote following a header.</p>
+
+  <p>When something is important enough, you do it even if the odds are not in your favor.</p>
+</blockquote>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Javascript code with syntax highlighting.</span>
+<span class="kd">var</span> <span class="nx">fun</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">lang</span><span class="p">(</span><span class="nx">l</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">dateformat</span><span class="p">.</span><span class="nx">i18n</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">./lang/</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">l</span><span class="p">)</span>
+  <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Ruby code with syntax highlighting</span>
+<span class="no">GitHubPages</span><span class="o">::</span><span class="no">Dependencies</span><span class="p">.</span><span class="nf">gems</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">gem</span><span class="p">,</span> <span class="n">version</span><span class="o">|</span>
+  <span class="n">s</span><span class="p">.</span><span class="nf">add_dependency</span><span class="p">(</span><span class="n">gem</span><span class="p">,</span> <span class="s2">"= </span><span class="si">#{</span><span class="n">version</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<h4 id="header-4">Header 4</h4>
+
+<ul>
+  <li>This is an unordered list following a header.</li>
+  <li>This is an unordered list following a header.</li>
+  <li>This is an unordered list following a header.</li>
+</ul>
+
+<h5 id="header-5">Header 5</h5>
+
+<ol>
+  <li>This is an ordered list following a header.</li>
+  <li>This is an ordered list following a header.</li>
+  <li>This is an ordered list following a header.</li>
+</ol>
+
+<h6 id="header-6">Header 6</h6>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">head1</th>
+      <th style="text-align: left">head two</th>
+      <th style="text-align: left">three</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">ok</td>
+      <td style="text-align: left">good swedish fish</td>
+      <td style="text-align: left">nice</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">out of stock</td>
+      <td style="text-align: left">good and plenty</td>
+      <td style="text-align: left">nice</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">ok</td>
+      <td style="text-align: left">good <code class="language-plaintext highlighter-rouge">oreos</code></td>
+      <td style="text-align: left">hmm</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">ok</td>
+      <td style="text-align: left">good <code class="language-plaintext highlighter-rouge">zoute</code> drop</td>
+      <td style="text-align: left">yumm</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="theres-a-horizontal-rule-below-this">There’s a horizontal rule below this.</h3>
+
+<hr />
+
+<h3 id="here-is-an-unordered-list">Here is an unordered list:</h3>
+
+<ul>
+  <li>Item foo</li>
+  <li>Item bar</li>
+  <li>Item baz</li>
+  <li>Item zip</li>
+</ul>
+
+<h3 id="and-an-ordered-list">And an ordered list:</h3>
+
+<ol>
+  <li>Item one</li>
+  <li>Item two</li>
+  <li>Item three</li>
+  <li>Item four</li>
+</ol>
+
+<h3 id="and-a-nested-list">And a nested list:</h3>
+
+<ul>
+  <li>level 1 item
+    <ul>
+      <li>level 2 item</li>
+      <li>level 2 item
+        <ul>
+          <li>level 3 item</li>
+          <li>level 3 item</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>level 1 item
+    <ul>
+      <li>level 2 item</li>
+      <li>level 2 item</li>
+      <li>level 2 item</li>
+    </ul>
+  </li>
+  <li>level 1 item
+    <ul>
+      <li>level 2 item</li>
+      <li>level 2 item</li>
+    </ul>
+  </li>
+  <li>level 1 item</li>
+</ul>
+
+<h3 id="small-image">Small image</h3>
+
+<p><img src="https://github.githubassets.com/images/icons/emoji/octocat.png" alt="Octocat" /></p>
+
+<h3 id="large-image">Large image</h3>
+
+<p><img src="https://guides.github.com/activities/hello-world/branching.png" alt="Branching" /></p>
+
+<h3 id="definition-lists-can-be-used-with-html-syntax">Definition lists can be used with HTML syntax.</h3>
+
+<dl>
+<dt>Name</dt>
+<dd>Godzilla</dd>
+<dt>Born</dt>
+<dd>1952</dd>
+<dt>Birthplace</dt>
+<dd>Japan</dd>
+<dt>Color</dt>
+<dd>Green</dd>
+</dl>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Long, single-line code blocks should not wrap. They should horizontally scroll if they are too long. This line should be long enough to demonstrate this.
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>The final element.
+</code></pre></div></div>
+
+
+
+      <footer class="site-footer">
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a>.</span>
+      </footer>
+    </main>
+  </body>
+</html>
